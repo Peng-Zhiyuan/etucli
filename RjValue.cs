@@ -4,13 +4,13 @@ using System.IO;
 using System.Text;
 public class RjValue:RjElement
 {
-	public RjValue(string _key,object _value,RjValueType _value_type,string _des)
+	public RjValue(string key, string valueString, RjValueType valueType, string des)
 	{
-		m_class_type=RjClassType.VALUE;
-		m_key=_key;
-		m_value=_value;
-		m_value_type=_value_type;
-		m_des=_des;
+		this.classType = RjClassType.VALUE;
+		this.key = key;
+		this.valueString = valueString;
+		this.valueType = valueType;
+		this.des = des;
 	}
 	public override void AddElement (RjElement _element)
 	{
@@ -19,7 +19,7 @@ public class RjValue:RjElement
 	public override string ToCSharpCode()
 	{
 		string _class="\tpublic ";
-		switch(m_value_type)
+		switch(valueType)
 		{
 		case RjValueType.STRING:
 			_class+="string";
@@ -30,9 +30,12 @@ public class RjValue:RjElement
 		case RjValueType.FLOAT:
 			_class+="float";
 			break;
+		case RjValueType.BOOL:
+			_class += "bool";
+			break;
 		}
 
-		string _final_des=m_des;
+		string _final_des=des;
 		if(!string.IsNullOrEmpty(_final_des))
 		{
 			if(_final_des.Contains("<")&&_final_des.Contains(">"))
@@ -42,23 +45,23 @@ public class RjValue:RjElement
 				_final_des=_final_des.Substring(_e+1);
 			}
 		}
-		string _info=_class+" "+m_key+";  //"+_final_des;
+		string _info=_class+" "+key+";  //"+_final_des;
 //		Debug.Log(_info);
 		return _info;
 	}
 	public override string ToJson()
 	{
 		string _v="";
-		switch(m_value_type)
+		switch(valueType)
 		{
 		case RjValueType.STRING:
-			_v="\""+m_value.ToString().Replace("\\\"","\"").Replace("\"","\\\"")+"\"";
+			_v="\""+ this.valueString.ToString().Replace("\\\"","\"").Replace("\"","\\\"")+"\"";
 			break;
 		case RjValueType.INT:
 			int _out=0;
-			if(int.TryParse(m_value.ToString(),out _out))
+			if(int.TryParse(this.valueString.ToString(),out _out))
 			{
-				_v=_out.ToString();
+				_v= _out.ToString();
 			}
 			else
 			{
@@ -66,25 +69,42 @@ public class RjValue:RjElement
 			}
 			break;
 		case RjValueType.FLOAT:
-			_v=m_value.ToString();
+			_v= this.valueString.ToString();
+			break;
+		case RjValueType.BOOL:
+			if(this.valueString != "")
+			{
+				bool value;
+				var b = bool.TryParse(this.valueString, out value);
+				if(!b)
+				{
+					value = false;
+				}
+				_v = value.ToString().ToLower();
+			}
+			else
+			{
+				_v = "false";
+			}
+
 			break;
 		}
-		if(string.IsNullOrEmpty(m_key))
+		if(string.IsNullOrEmpty(key))
 		{
 			return _v;
 		}
 		else
 		{
-			return "\""+m_key+"\":"+_v;
+			return "\""+key+"\":"+_v;
 		}
 	}
 	public override string GetDes ()
 	{
-		return m_des;
+		return des;
 	}
 	public override string GetTypeStr ()
 	{
-		switch(m_value_type)
+		switch(valueType)
 		{
 		case RjValueType.STRING:
 		default:
@@ -93,10 +113,12 @@ public class RjValue:RjElement
 			return "int";
 		case RjValueType.FLOAT:
 			return "float";
+		case RjValueType.BOOL:
+			return "bool";
 		}
 	}
-	string m_key;
-	object m_value;
-	string m_des;
-	RjValueType m_value_type;
+	string key;
+	string valueString;
+	string des;
+	RjValueType valueType;
 }

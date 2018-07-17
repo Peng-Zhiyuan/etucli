@@ -16,6 +16,7 @@ public enum RjValueType
 	STRING,
 	INT,
 	FLOAT,
+	BOOL,
 }
 
 public class RjClassInfo
@@ -53,10 +54,10 @@ public abstract class RjElement
 	}
 	public RjClassType GetClassType()
 	{
-		return m_class_type;
+		return classType;
 	}
 	RjElement m_parent;
-	protected RjClassType m_class_type;
+	protected RjClassType classType;
 }
 
 
@@ -77,7 +78,7 @@ public class RjData:RjElement
 				m_key=m_key.Substring(_e+1);
 			}
 		}
-		m_class_type=RjClassType.STUCT;
+		classType=RjClassType.STUCT;
 	}
 
 	public override void AddElement(RjElement _element)

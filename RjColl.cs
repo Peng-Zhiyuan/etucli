@@ -7,7 +7,7 @@ public class RjColl:RjElement
 {
 	public RjColl(string _key)
 	{
-		m_class_type=RjClassType.COLL;
+		classType=RjClassType.COLL;
 		m_key=_key;
 		if(!string.IsNullOrEmpty(m_key))
 		{

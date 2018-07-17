@@ -61,6 +61,10 @@ public class DataMaker
 			{
 				continue;
 			}
+			if(fi.Name.StartsWith("~"))
+			{
+				continue;
+			}
 
 			string fileNameWithoutExtension = fi.Name.Replace(".xlsx", "");
 			var package = OpenExcelFile(file);
@@ -390,6 +394,7 @@ public void GenerateJsonFile(string fileNameWithoutExtension, bool quick, ExcelP
 			//_info=InfoTail(_file_name,_info);
 
 			//result.json_str[_file_name] = JsonMapper.Instance.ToObject(_sinfo);
+
             result.fileNameToJsonObject[tableName] = JsonMapper.Instance.ToObject(_sinfo);
 
 			// var filePath = DataMakerConf.Instance.m_server_dir + tableName + ".json";
@@ -509,21 +514,28 @@ public void GenerateJsonFile(string fileNameWithoutExtension, bool quick, ExcelP
 	
 	public static void AddElement(RjElement parent, ExcelWorksheet sheet, ExcelRow row, int index, string key)
 	{
-		string _type_info=GetSheetCell(sheet, KEY_TYPE_ROW_INDEX, index).ToString();
-		RjValueType _value_type=RjValueType.INT;
-		if(_type_info=="int")
+		string typeString = GetSheetCell(sheet, KEY_TYPE_ROW_INDEX, index).ToString();
+		RjValueType type = RjValueType.INT;
+		if(typeString=="int")
 		{
-			_value_type=RjValueType.INT;
-		}else if(_type_info=="float")
-		{
-			_value_type=RjValueType.FLOAT;
+			type = RjValueType.INT;
 		}
-		else
+		else if(typeString=="float")
 		{
-			_value_type=RjValueType.STRING;
+			type = RjValueType.FLOAT;
+		}
+		else if(typeString == "bool")
+		{
+			type = RjValueType.BOOL;
+		}
+		else 
+		{
+			type = RjValueType.STRING;
 		}
 		// parent.AddElement(new RjValue(key, row[index] ,_value_type, GetSheetCell(sheet, DES_TYPE_ROW_INDEX, index).ToString()));
-		parent.AddElement(new RjValue(key, GetSheetCell(sheet, row.Row, index) ,_value_type, GetSheetCell(sheet, DES_TYPE_ROW_INDEX, index).ToString()));
+		var valueString = GetSheetCell(sheet, row.Row, index).ToString();
+		var rjValue = new RjValue(key, valueString, type, GetSheetCell(sheet, DES_TYPE_ROW_INDEX, index).ToString());
+		parent.AddElement(rjValue);
 	}
 
 	private static object GetSheetCell(ExcelWorksheet sheet, int rowIndexBase0, int colIndexBase0)
