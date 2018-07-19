@@ -83,6 +83,7 @@ public class DataMaker
 			int _lindex=file.LastIndexOf('/');
 			string _file_name=file.Substring(_lindex+1);
 			PlayerPrefs.SetString(_file_name,File.GetLastWriteTime(file).Ticks.ToString());
+			package.Dispose();
 		}
 
 		Console.WriteLine($"[ETU] success: {result.successCount}, fail: {result.failCount}");
